@@ -49,7 +49,7 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--input',
                         dest="input",
                         action="store",
-                        default="files/",
+                        default="files/3QNA/",
                         help="The input file/folder")
 
     options = parser.parse_args()
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     sp = stamp.STAMPParser()
     sp.create_stamp_input(input_files)
     sp.calculate_stamp_scores()
-    sp.filter_stamp_scores(8)
+    sp.filter_stamp_scores(9.8)
 
     complexes_pairs = sp.get_complexes_list()
 
@@ -85,7 +85,7 @@ if __name__ == "__main__":
 
                 if not clashes.get_clashes(structure, added_chain):
                     complexes_pairs.remove(candidate_complex)
-                    to_evaluate.append(candidate)
+                    to_evaluate.append(sp.complementary_chain(candidate))
                 else:
                     structure[0].detach_child(added_chain._id)
 
