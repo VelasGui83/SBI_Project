@@ -1,6 +1,6 @@
 from random import randint
 from Bio.PDB import PDBParser
-import os
+import subprocess
 
 from Bio import BiopythonWarning
 
@@ -44,7 +44,7 @@ class STAMPParser(object):
             # TODO: change read PDB for regexp
             structure = parser.get_structure(i, filename)
             for chain in structure.get_chains():
-                fh_write.write("%s %d:%d_%s {CHAIN %s}\n" %(filename, i, i+1, chain.id, chain.id))
+                fh_write.write("../%s %d:%d_%s {CHAIN %s}\n" %(filename, i, i+1, chain.id, chain.id))
                 try:
                     self.complex_files["%d:%d" %(i, i+1)][chain.id] = filename
                 except KeyError:
@@ -58,12 +58,11 @@ class STAMPParser(object):
         """
 
         """
-        # TODO: move stamp *.number to tmp folder
-        cmd = "stamp -l tmp/output_%d.domain -MAX_SEQ_LEN 100000 -rough -n 2 -prefix out_%d > tmp/stamp_%d.out" %(self.id, self.id, self.id)
-        os.system(cmd)
-        fh_stamp = open("tmp/stamp_%d.out"  %(self.id), "r")
+        cmd = "stamp -l output_%d.domain -MAX_SEQ_LEN 100000 -rough -n 2 -prefix output_%d" %(self.id, self.id)
+        stamp_process = subprocess.Popen(cmd.split(), cwd="tmp/", stdout=subprocess.PIPE)
 
-        for line in fh_stamp:
+        for line in stamp_process.stdout:
+            line = line.decode("utf-8")
             if line.startswith("Pair"):
                 splited_line = line.split()
                 try:
@@ -71,6 +70,10 @@ class STAMPParser(object):
                 except KeyError:
                     self.stamp_scores[splited_line[2]] = []
                     self.stamp_scores[splited_line[2]].append((splited_line[3], float(splited_line[4])))
+        cmd = "rm output_%d.*" %self.id
+        subprocess.Popen(cmd, cwd="tmp/", shell=True)
+        cmd = "rm stamp_rough.trans"
+        subprocess.Popen(cmd.split(), cwd="tmp/")
 
     def filter_stamp_scores(self, limit):
         """
