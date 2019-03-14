@@ -60,7 +60,7 @@ if __name__ == "__main__":
     sp = stamp.STAMPParser()
     sp.create_stamp_input(input_files)
     sp.calculate_stamp_scores()
-    sp.filter_stamp_scores(9.8)
+    sp.filter_stamp_scores(8)
 
     complexes_pairs = sp.get_complexes_list()
 
@@ -85,9 +85,9 @@ if __name__ == "__main__":
 
                 if not clashes.get_clashes(structure, added_chain):
                     complexes_pairs.remove(candidate_complex)
-                    to_evaluate.append(candidate_complex+"_"+added_chain._id)
+                    to_evaluate.append(candidate)
                 else:
-                    structure.detach_child(added_chain._id)
+                    structure[0].detach_child(added_chain._id)
 
     io = PDBIO()
     io.set_structure(structure)

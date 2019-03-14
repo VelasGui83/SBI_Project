@@ -49,7 +49,7 @@ def get_clashes(structure, chain):
                             print("Evaluating possible clash...")
                             for atom in residue:
                                 coord_atom = (atom.get_coord())
-                                close_atoms_to_atom = ns.search(coord_atom, 1.5) #CH distance 1.09
+                                close_atoms_to_atom = ns.search(coord_atom, 3.5) #CH distance 1.09
                                 if close_atoms_to_atom:
                                     print("WARNING IMPORTANT CLASH - CHANGING CHAIN")
                                     return(True)
