@@ -3,10 +3,10 @@ import numpy as np
 
 chain_dict = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH', 'II', 'JJ', 'KK', 'LL', 'MM', 'NN', 'OO', 'PP', 'QQ', 'RR', 'SS', 'TT', 'UU', 'VV', 'WW', 'XX', 'YY', 'ZZ', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
 
-def next_available_chain_label(model):
+def next_available_chain_label(model, excluded):
     letters_used = [x._id for x in model.get_chains()]
     for letter in chain_dict:
-        if letter not in letters_used:
+        if letter not in letters_used and letter not in excluded:
             return letter
     return None
 
@@ -20,7 +20,7 @@ def do_superimpose(fixed_model, moveable_complex, fixed_chain, target_chain, mov
     s2_moved_chain = s2[0][moveable_chain.label]
     s2_moved_chain_atoms = []
 
-    new_chain_id = next_available_chain_label(fixed_model)
+    new_chain_id = next_available_chain_label(fixed_model, set([s2_target_chain.id]))
     s2_moved_chain.id = new_chain_id
     moveable_chain.label = new_chain_id
 
