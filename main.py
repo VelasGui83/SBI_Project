@@ -36,16 +36,22 @@ if __name__ == "__main__":
     while to_evaluate and remaining_complexes:
         evaluating_chain = to_evaluate.pop(0)
 
-        for candidate in evaluating_chain.similar_chains:
-            candidate = candidate[0]
-            candidate_complex = candidate.parent
-            if candidate_complex.id in remaining_complexes:
-                added_chain = al.do_superimpose(model, candidate_complex, evaluating_chain, candidate, candidate_complex.complementary_chain(candidate))
+        for candidate_chain in evaluating_chain.similar_chains:
+            candidate_chain = candidate_chain[0]
+            candidate_complex = candidate_chain.parent
 
-                if not al.get_clashes(model, added_chain):
+            complementary_candidate_chain = candidate_complex.complementary_chain(candidate_chain)
+            old_complementary_candidate_label = complementary_candidate_chain.label
+
+            if candidate_complex.id in remaining_complexes:
+                added_chain = al.do_superimpose(model, candidate_complex, evaluating_chain, candidate_chain, complementary_candidate_chain)
+
+                if not al.get_clashes_v2(model, added_chain):
+                    candidate_complex.chain_dict[complementary_candidate_chain.label] = candidate_complex.chain_dict.pop(old_complementary_candidate_label)
                     remaining_complexes.remove(candidate_complex.id)
-                    to_evaluate.append(candidate_complex.complementary_chain(candidate))
+                    to_evaluate.append(candidate_complex.complementary_chain(candidate_chain))
                 else:
+                    complementary_candidate_chain.label = old_complementary_candidate_label
                     model.detach_child(added_chain.id)
 
     io = PDBIO()

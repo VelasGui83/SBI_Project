@@ -93,3 +93,27 @@ def get_clashes(model, chain):
                                     return(True)
                             
             return(False)
+
+def get_clashes_v2(model, chain):
+    """
+
+    """
+
+    atoms_to_compare = []
+    for chain_moved in model:
+        if chain != chain_moved:
+            atoms_to_compare = atoms_to_compare + list(chain_moved.get_atoms())
+    
+    atoms  = Selection.unfold_entities(atoms_to_compare, 'A')
+    ns = NeighborSearch(atoms)
+    print("Evaluating possible clashes")
+    print("Comparing to ",len(list(model.get_atoms())), " entities")
+    for residue in chain:
+        for atom in residue:
+            coord_atom = (atom.get_coord())
+            close_atoms_to_atom = ns.search(coord_atom, 1.5) #CH distance 1.09
+            if close_atoms_to_atom:
+                print("WARNING IMPORTANT CLASH - CHANGING CHAIN")
+                return(True)
+    
+    return(False)
