@@ -124,10 +124,10 @@ class STAMPParser(object):
             if line.startswith("Pair"):
                 splited_line = line.split()
 
-                chain = self.comlex_dict[splited_line[2].split("_")[0]].chain_dict[splited_line[2].split("_")[1]]
-                target_chain = self.comlex_dict[splited_line[3].split("_")[0]].chain_dict[splited_line[3].split("_")[1]]
-
-                chain.similar_chains.append((target_chain, float(splited_line[4])))
+                if splited_line[6] == splited_line[7]:
+                    chain = self.comlex_dict[splited_line[2].split("_")[0]].chain_dict[splited_line[2].split("_")[1]]
+                    target_chain = self.comlex_dict[splited_line[3].split("_")[0]].chain_dict[splited_line[3].split("_")[1]]
+                    chain.similar_chains.append((target_chain, float(splited_line[4])))
 
         cmd = "rm output_%d.*" %self.id
         subprocess.Popen(cmd, cwd="tmp/", shell=True)

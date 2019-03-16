@@ -14,26 +14,25 @@ def do_superimpose(fixed_model, moveable_complex, fixed_chain, target_chain, mov
     parser = PDBParser()
     s2 = parser.get_structure(moveable_complex.id, moveable_complex.filename)
 
-    s1_fixed_chain = fixed_model[fixed_chain.label]
-    s2_target_chain = s2[0][target_chain.label]
+    s1_fixed_chain = fixed_model[fixed_chain]
+    s2_target_chain = s2[0][target_chain]
 
-    s2_moved_chain = s2[0][moveable_chain.label]
+    s2_moved_chain = s2[0][moveable_chain]
     s2_moved_chain_atoms = []
 
     new_chain_id = next_available_chain_label(fixed_model, set([s2_target_chain.id]))
     s2_moved_chain.id = new_chain_id
-    moveable_chain.label = new_chain_id
 
     # Extract information of atoms
     for residues in s2_moved_chain:
         s2_moved_chain_atoms.append(residues)
 
     sup = Superimposer()
+
     # Specify the atom lists
     # 'fixed' and 'moving' are lists of Atom objects
     # The moving atoms will be put on the fixed atoms
     sup.set_atoms(list(s1_fixed_chain.get_atoms()), list(s2_target_chain.get_atoms()))
-
     # Apply rotation/translation to the moving atoms
     sup.apply(s2_moved_chain_atoms)
 
@@ -111,7 +110,7 @@ def get_clashes_v2(model, chain):
     for residue in chain:
         for atom in residue:
             coord_atom = (atom.get_coord())
-            close_atoms_to_atom = ns.search(coord_atom, 1.5) #CH distance 1.09
+            close_atoms_to_atom = ns.search(coord_atom, 0.5) #CH distance 1.09
             if close_atoms_to_atom:
                 print("WARNING IMPORTANT CLASH - CHANGING CHAIN")
                 return(True)
