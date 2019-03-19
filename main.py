@@ -26,10 +26,11 @@ def get_homologous_tuples(evaluating_chain, complexes_list, identity=1.0):
                     tuple_list.append((cd.complexes[complex_item].filename, complex_item, label))
     return tuple_list
 
-def add_homologous_chains(chain ,complex_dictionary, compare_complex_list):
+def get_homologous_chains(chain ,complex_dictionary, compare_complex_list):
     """
 
     """
+    homologous_set = set([])
     #Without STAMP
     # homologous_list = [x[1]+"_"+x[2] for x in get_homologous_tuples(chain, remaining_complexes, 1)]
     # homologous_list.pop(0)
@@ -45,7 +46,8 @@ def add_homologous_chains(chain ,complex_dictionary, compare_complex_list):
             for homologous_chain in homologous_list:
                 complex_id = homologous_chain.split("_")[0]
                 chain_label = homologous_chain.split("_")[1]
-                chain.homologous_chains.add(complex_dictionary.complexes[complex_id].chain_dict[chain_label])
+                homologous_set.add(complex_dictionary.complexes[complex_id].chain_dict[chain_label])
+    return homologous_set
 
 if __name__ == "__main__":
     """
@@ -76,27 +78,34 @@ if __name__ == "__main__":
     structure = parser.get_structure("final_structure", first_complex.filename)
     model = structure[0]
 
-    while to_evaluate and remaining_complexes:
+    for complex_item in cd.complexes.values():
+        for chain_item in complex_item.chain_dict.values():
+            if not chain_item.homologous_chains:
+                homologous_set = get_homologous_chains(chain_item, cd, cd.get_complexes_list())
+                homologous_set.add(chain_item)
+                for chain in homologous_set:
+                    homologous_specific_set = copy.copy(homologous_set)
+                    homologous_specific_set.remove(chain)
+                    chain.homologous_chains = homologous_specific_set
+
+    while to_evaluate:
         evaluating_chain = to_evaluate.pop(0)
-        add_homologous_chains(evaluating_chain, cd, remaining_complexes)
 
         for candidate_chain in evaluating_chain.homologous_chains:
             candidate_complex = candidate_chain.parent
 
             complementary_candidate_chain = candidate_complex.complementary_chain(candidate_chain)
 
-            if candidate_complex.id in remaining_complexes:
-                added_chain = al.do_superimpose(model, candidate_complex, evaluating_chain.label, candidate_chain.original_label, complementary_candidate_chain.original_label)
+            added_chain = al.do_superimpose(model, candidate_complex, evaluating_chain.label, candidate_chain.original_label, complementary_candidate_chain.original_label)
 
-                if not al.get_clashes_v2(model, added_chain):
-                    del candidate_complex.chain_dict[complementary_candidate_chain.label]
-                    complementary_candidate_chain.label = added_chain.id
-                    candidate_complex.chain_dict[added_chain.id] = complementary_candidate_chain
+            if not al.get_clashes_v2(model, added_chain):
+                next_to_evaluate = copy.copy(complementary_candidate_chain)
+                next_to_evaluate.label = added_chain.id
+                to_evaluate.append(next_to_evaluate)
 
-                    remaining_complexes.remove(candidate_complex.id)
-                    to_evaluate.append(candidate_complex.complementary_chain(candidate_chain))
-                else:
-                    model.detach_child(added_chain.id)
+                print("Chain added. #%d" %len(model))
+            else:
+                model.detach_child(added_chain.id)
 
     io = PDBIO()
     io.set_structure(structure)
@@ -104,7 +113,7 @@ if __name__ == "__main__":
     
     # while to_evaluate and remaining_complexes:
     #     evaluating_chain = to_evaluate.pop(0)
-    #     add_homologous_chains(evaluating_chain, cd, remaining_complexes)
+    #     evaluating_chain.homologous_chains = get_homologous_chains(evaluating_chain, cd, remaining_complexes)
 
     #     for candidate_chain in evaluating_chain.homologous_chains:
     #         candidate_complex = candidate_chain.parent
@@ -125,10 +134,15 @@ if __name__ == "__main__":
     #                 model.detach_child(added_chain.id)
     
 
-
     # for complex_item in cd.complexes.values():
     #     for chain_item in complex_item.chain_dict.values():
-    #         add_homologous_chains(chain_item, cd, cd.get_complexes_list())
+    #         if not chain_item.homologous_chains:
+    #             homologous_set = get_homologous_chains(chain_item, cd, cd.get_complexes_list())
+    #             homologous_set.add(chain_item)
+    #             for chain in homologous_set:
+    #                 homologous_specific_set = copy.copy(homologous_set)
+    #                 homologous_specific_set.remove(chain)
+    #                 chain.homologous_chains = homologous_specific_set
 
     # while to_evaluate:
     #     evaluating_chain = to_evaluate.pop(0)
@@ -143,7 +157,8 @@ if __name__ == "__main__":
     #         if not al.get_clashes_v2(model, added_chain):
     #             next_to_evaluate = copy.copy(complementary_candidate_chain)
     #             next_to_evaluate.label = added_chain.id
-                
     #             to_evaluate.append(next_to_evaluate)
+
+    #             print("Chain added. #%d" %len(model))
     #         else:
     #             model.detach_child(added_chain.id)
