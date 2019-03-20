@@ -3,7 +3,7 @@ import PDBFiles
 import argparse
 import ExcludeWaterSelect
 import Alignment as al
-from Bio.PDB import PDBIO, PDBParser, PDBExceptions
+from Bio.PDB import PDBIO, PDBParser, PDBExceptions, MMCIFIO
 from Bio.PDB.Polypeptide import PPBuilder
 import Levenshtein
 import copy
@@ -12,18 +12,25 @@ def get_homologous_tuples(evaluating_chain, complexes_list, identity=1.0):
     """
 
     """
+    ppb = PPBuilder()
+
     tuple_list = [(evaluating_chain.parent.filename, evaluating_chain.parent.id, evaluating_chain.original_label)]
 
     evaluating_structure = PDBParser().get_structure(evaluating_chain.original_label, evaluating_chain.parent.filename)
-    evaluating_sequence = ppb.build_peptides(evaluating_structure[0][evaluating_chain.original_label])[0].get_sequence()
-
-    for complex_item in complexes_list:
-        complex_structure = PDBParser().get_structure(complex_item, cd.complexes[complex_item].filename)
-        for label in cd.complexes[complex_item].chain_dict.keys():
-            if complex_item != evaluating_chain.parent.id or label != evaluating_chain.label:
-                chain_sequence = ppb.build_peptides(complex_structure[0][label])[0].get_sequence()
-                if Levenshtein.ratio(str(evaluating_sequence), str(chain_sequence)) >= identity:
-                    tuple_list.append((cd.complexes[complex_item].filename, complex_item, label))
+    evaluating_polypeptide = ppb.build_peptides(evaluating_structure[0][evaluating_chain.original_label])
+    if evaluating_polypeptide:
+        if not evaluating_polypeptide[0][0].has_id("CA"):
+            return tuple_list            
+        evaluating_sequence = evaluating_polypeptide[0].get_sequence()
+        for complex_item in complexes_list:
+            complex_structure = PDBParser().get_structure(complex_item, cd.complexes[complex_item].filename)
+            for label in cd.complexes[complex_item].chain_dict.keys():
+                if complex_item != evaluating_chain.parent.id or label != evaluating_chain.label:
+                    chain_polypeptide = ppb.build_peptides(complex_structure[0][label])
+                    if chain_polypeptide:
+                        chain_sequence = chain_polypeptide[0].get_sequence()
+                        if Levenshtein.ratio(str(evaluating_sequence), str(chain_sequence)) >= identity:
+                            tuple_list.append((cd.complexes[complex_item].filename, complex_item, label))
     return tuple_list
 
 def get_homologous_chains(chain ,complex_dictionary, compare_complex_list):
@@ -31,13 +38,10 @@ def get_homologous_chains(chain ,complex_dictionary, compare_complex_list):
 
     """
     homologous_set = set([])
-    #Without STAMP
-    # homologous_list = [x[1]+"_"+x[2] for x in get_homologous_tuples(chain, remaining_complexes, 1)]
-    # homologous_list.pop(0)
 
-    #With STAMP
-    homologous_tuples = get_homologous_tuples(chain, compare_complex_list, 0.9)
+    homologous_tuples = get_homologous_tuples(chain, compare_complex_list, 1)
     if len(homologous_tuples) != 1:
+        #With STAMP
         sp.create_stamp_input(homologous_tuples)
         stamp_id = chain.parent.id+"_"+chain.original_label
         scores_dict = sp.get_stamp_scores(chain_id=stamp_id)
@@ -47,6 +51,14 @@ def get_homologous_chains(chain ,complex_dictionary, compare_complex_list):
                 complex_id = homologous_chain.split("_")[0]
                 chain_label = homologous_chain.split("_")[1]
                 homologous_set.add(complex_dictionary.complexes[complex_id].chain_dict[chain_label])
+    else:
+        # #Without STAMP
+        homologous_list = get_homologous_tuples(chain, compare_complex_list, 1)
+        homologous_list.pop(0)
+        for homologous_chain in homologous_list:
+            complex_id = homologous_chain[1]
+            chain_label = homologous_chain[2]
+            homologous_set.add(complex_dictionary.complexes[complex_id].chain_dict[chain_label])
     return homologous_set
 
 if __name__ == "__main__":
@@ -72,11 +84,12 @@ if __name__ == "__main__":
     to_evaluate = [first_chains[0], first_chains[1]]
 
     parser = PDBParser()
-    ppb = PPBuilder()
     sp = stamp.Parser()
     
     structure = parser.get_structure("final_structure", first_complex.filename)
     model = structure[0]
+
+    chain_number = 2
 
     for complex_item in cd.complexes.values():
         for chain_item in complex_item.chain_dict.values():
@@ -104,12 +117,26 @@ if __name__ == "__main__":
                 to_evaluate.append(next_to_evaluate)
 
                 print("Chain added. #%d" %len(model))
+
+                chain_number += 1
+                if chain_number % 50 == 0:
+                    io = MMCIFIO()
+                    io.set_structure(structure)
+                    io.save(filepath="final.cif", select=ExcludeWaterSelect.ExcludeWaterSelect())
+                    print("Structure saved!!")
+                if chain_number == 200:
+                    break
             else:
                 model.detach_child(added_chain.id)
 
-    io = PDBIO()
-    io.set_structure(structure)
-    io.save(file="final.pdb", select=ExcludeWaterSelect.ExcludeWaterSelect())
+    if chain_number > 50:
+        io = MMCIFIO()
+        io.set_structure(structure)
+        io.save(filepath="final.cif", select=ExcludeWaterSelect.ExcludeWaterSelect())
+    else:
+        io = PDBIO()
+        io.set_structure(structure)
+        io.save(file="final.pdb", select=ExcludeWaterSelect.ExcludeWaterSelect())
     
     # while to_evaluate and remaining_complexes:
     #     evaluating_chain = to_evaluate.pop(0)
@@ -130,9 +157,21 @@ if __name__ == "__main__":
 
     #                 remaining_complexes.remove(candidate_complex.id)
     #                 to_evaluate.append(candidate_complex.complementary_chain(candidate_chain))
+
+    #                 print("Chain added. #%d" %len(model))
+
+    #                 chain_number += 1
+    #                 if chain_number % 50 == 0:
+    #                     io = MMCIFIO()
+    #                     io.set_structure(structure)
+    #                     io.save(filepath="final.cif", select=ExcludeWaterSelect.ExcludeWaterSelect())
+    #                     print("Structure saved!!")
+    #                 if chain_number == 200:
+    #                     break
     #             else:
     #                 model.detach_child(added_chain.id)
     
+
 
     # for complex_item in cd.complexes.values():
     #     for chain_item in complex_item.chain_dict.values():
@@ -160,5 +199,14 @@ if __name__ == "__main__":
     #             to_evaluate.append(next_to_evaluate)
 
     #             print("Chain added. #%d" %len(model))
+
+    #             chain_number += 1
+    #             if chain_number % 50 == 0:
+    #                 io = MMCIFIO()
+    #                 io.set_structure(structure)
+    #                 io.save(filepath="final.cif", select=ExcludeWaterSelect.ExcludeWaterSelect())
+    #                 print("Structure saved!!")
+    #             if chain_number == 200:
+    #                 break
     #         else:
     #             model.detach_child(added_chain.id)

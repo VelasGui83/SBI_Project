@@ -14,8 +14,34 @@ def do_superimpose(fixed_model, moveable_complex, fixed_chain, target_chain, mov
     s2 = parser.get_structure(moveable_complex.id, moveable_complex.filename)
 
     s1_fixed_chain = fixed_model[fixed_chain]
-    s2_target_chain = s2[0][target_chain]
+    fixed_atoms = []
 
+    if s1_fixed_chain.child_list[0].has_id("CA"):
+        for fixed_res in s1_fixed_chain:
+            if fixed_res.has_id("CA"):
+                fixed_atoms.append(fixed_res['CA'])
+    else:
+        fixed_atoms = list(s1_fixed_chain.get_atoms())
+
+
+    s2_target_chain = s2[0][target_chain]
+    target_atoms = []
+    if s2_target_chain.child_list[0].has_id("CA"):
+        for target_res in s1_fixed_chain:
+            if target_res.has_id("CA"):
+                target_atoms.append(target_res['CA'])
+    else: 
+        target_atoms = list(s2_target_chain.get_atoms())
+
+
+    sup = Superimposer()
+    # Specify the atom lists
+    # 'fixed' and 'moving' are lists of Atom objects
+    # The moving atoms will be put on the fixed atoms
+    sup.set_atoms(fixed_atoms, target_atoms)
+
+
+    # Apply rotation/translation to the moving atoms
     s2_moved_chain = s2[0][moveable_chain]
     s2_moved_chain_atoms = []
 
@@ -26,14 +52,9 @@ def do_superimpose(fixed_model, moveable_complex, fixed_chain, target_chain, mov
     for residues in s2_moved_chain:
         s2_moved_chain_atoms.append(residues)
 
-    sup = Superimposer()
-
-    # Specify the atom lists
-    # 'fixed' and 'moving' are lists of Atom objects
-    # The moving atoms will be put on the fixed atoms
-    sup.set_atoms(list(s1_fixed_chain.get_atoms()), list(s2_target_chain.get_atoms()))
-    # Apply rotation/translation to the moving atoms
     sup.apply(s2_moved_chain_atoms)
+
+
 
     fixed_model.add(s2_moved_chain)
 
