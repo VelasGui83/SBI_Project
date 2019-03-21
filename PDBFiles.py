@@ -1,9 +1,4 @@
 import utils
-from Bio.PDB import PDBParser
-from Bio import BiopythonWarning
-
-import warnings
-warnings.simplefilter("ignore", BiopythonWarning)
 
 class Chain(object):
     """
@@ -72,6 +67,14 @@ class ComplexDictionary(object):
         """
         return list(self.complexes.keys())
 
+    def _get_chains(self, input_file):
+        set_chains = set([])
+        with open(input_file, 'r') as fh:
+            for line in fh:
+                if line.startswith("ATOM"):
+                    set_chains.add(line[21])
+        return set_chains
+
     def populate_complex(self, input_folder):
         """
 
@@ -79,16 +82,14 @@ class ComplexDictionary(object):
         input_files = utils.get_files(input_path=input_folder, admited_formats=set(["pdb"]))
         utils.remove_items_containing(input_files, "chain")
 
-        parser = PDBParser()
         i = 1
         for filename in input_files:
-            # TODO: change read PDB for regexp
-            structure = parser.get_structure(i, filename)
-            for chain in structure.get_chains():
+            chains = sorted(list(self._get_chains(filename)))
+            for chain in chains:
                 complex_id = "%d:%d" %(i, i+1)
                 try:
-                    self.complexes[complex_id].chain_dict[chain.id] = Chain(chain.id, self.complexes[complex_id])
+                    self.complexes[complex_id].chain_dict[chain] = Chain(chain, self.complexes[complex_id])
                 except KeyError:
                     self.complexes[complex_id] = Complex(complex_id, filename)
-                    self.complexes[complex_id].chain_dict[chain.id] = Chain(chain.id, self.complexes[complex_id])
+                    self.complexes[complex_id].chain_dict[chain] = Chain(chain, self.complexes[complex_id])
             i += 2

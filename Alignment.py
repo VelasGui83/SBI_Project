@@ -15,7 +15,6 @@ def do_superimpose(fixed_model, moveable_complex, fixed_chain, target_chain, mov
 
     s1_fixed_chain = fixed_model[fixed_chain]
     fixed_atoms = []
-
     if s1_fixed_chain.child_list[0].has_id("CA"):
         for fixed_res in s1_fixed_chain:
             if fixed_res.has_id("CA"):
@@ -27,7 +26,7 @@ def do_superimpose(fixed_model, moveable_complex, fixed_chain, target_chain, mov
     s2_target_chain = s2[0][target_chain]
     target_atoms = []
     if s2_target_chain.child_list[0].has_id("CA"):
-        for target_res in s1_fixed_chain:
+        for target_res in s2_target_chain:
             if target_res.has_id("CA"):
                 target_atoms.append(target_res['CA'])
     else: 
@@ -130,7 +129,7 @@ def get_clashes_v2(model, chain):
     for residue in chain:
         for atom in residue:
             coord_atom = (atom.get_coord())
-            close_atoms_to_atom = ns.search(coord_atom, 1.1) #CH distance 1.09
+            close_atoms_to_atom = ns.search(coord_atom, 0.8) #CH distance 1.09
             if close_atoms_to_atom:
                 print("WARNING IMPORTANT CLASH - CHANGING CHAIN")
                 return(True)
