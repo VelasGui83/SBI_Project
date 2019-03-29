@@ -2,7 +2,7 @@ import argparse
 import copy
 
 import numpy as np
-from Bio.PDB import (MMCIFIO, PDBIO, NeighborSearch, PDBExceptions, PDBParser,
+from Bio.PDB import (MMCIFIO, PDBIO, NeighborSearch, PDBParser,
                      Selection, Superimposer)
 from Bio.PDB.Polypeptide import PPBuilder
 
@@ -144,8 +144,13 @@ def is_chain_clashed_v3(model, chain, limit=5):
     
     return False
 
-def create_macrocomplex(model, to_evaluate):
-    """
+def add_chains_to_model(model, to_evaluate):
+    """Add chains to a model and return the number of final chains.
+
+    Arguments:
+        - model - Bio.PDB.Model, the starting model add chains
+        - to_evaluate - list of interaction.Chain, a list of populated chians to evaluate
+                        for our model
 
     """
     while to_evaluate:
@@ -177,40 +182,19 @@ def create_macrocomplex(model, to_evaluate):
                     return len(model)
     return len(model)
 
-def populate_homologous_chains(interactions):
-    for complex_item in interactions.interactions.values():
-        for chain_item in complex_item.chain_dict.values():
-            if not chain_item.homologous_chains:
-                homologous_set = chain_item.get_homologous_chains(inter)
-                homologous_set.add(chain_item)
-                for chain in homologous_set:
-                    homologous_specific_set = copy.copy(homologous_set)
-                    homologous_specific_set.remove(chain)
-                    chain.homologous_chains = homologous_specific_set
+def create_macrocomplex(input_folder):
+    """Retruns a Bio.PDB.Structure composed by complex pairs.
 
-if __name__ == "__main__":
-    """
+    Arguments:
+        - minput_folderodel - string, folder containing a list of compex pairs
 
     """
-    parser = argparse.ArgumentParser(description="This program filter vcf files by QUAL and DP")
-    parser.add_argument('-i', '--input',
-                        dest="input",
-                        action="store",
-                        default="examples/Example/",
-                        help="The input file/folder")
-    parser.add_argument('-o', '--output',
-                        dest="output",
-                        action="store",
-                        default="./macrocomplex",
-                        help="The input file/folder")
-
-    options = parser.parse_args()
     inter = interactions.Interactions()
 
-    inter.populate_interactions(options.input)
-    remaining_complexes = inter.get_complexes_list()
+    inter.populate_interactions(input_folder)
+    inter.populate_homologous_chains(score_limit=9.8)
 
-    populate_homologous_chains(inter)
+    remaining_complexes = inter.get_complexes_list()
 
     parser = PDBParser()
     model = None
@@ -222,9 +206,28 @@ if __name__ == "__main__":
         structure = parser.get_structure("final_structure", first_complex.filename)
         model = structure[0]
 
-        chain_number = create_macrocomplex(model, to_evaluate)
+        chain_number = add_chains_to_model(model, to_evaluate)
+    
+    return structure
 
-    if chain_number > 52:
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="This programs creates a macrocomplex given the pair of interactions.")
+    parser.add_argument('-i', '--input',
+                        dest="input",
+                        action="store",
+                        default="examples/Example/",
+                        help="The input folder containing the complexes files")
+    parser.add_argument('-o', '--output',
+                        dest="output",
+                        action="store",
+                        default="./macrocomplex",
+                        help="The output file")
+
+    options = parser.parse_args()
+
+    structure = create_macrocomplex(options.input)
+
+    if len(structure[0]) > 52:
         io = MMCIFIO()
         io.set_structure(structure)
         io.save(filepath=options.output+".cif", select=exclude_water.ExcludeWaterSelect())
