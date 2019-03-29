@@ -72,7 +72,7 @@ def center_of_mass(pdbfile, include='ATOM,HETATM'):
 
 def center_of_mass_chain(chain, include='ATOM,HETATM'):
     """
-    Calculates center of mass of a protein and/or ligand structure.
+    Calculates center of mass of a Bio.PDB.Chain.
 
     Returns:
         center (list): List of float coordinates [x,y,z] that represent the

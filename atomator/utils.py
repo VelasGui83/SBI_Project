@@ -3,13 +3,21 @@ import os.path
 import re
 
 def get_file_extension(filename):
-    """
+    """Return the extension of a file.
+
+        Arguments:
+         - filename - string, the file to extract the extension
     
     """
+    # If we want to get compound extensions, we just need to add it in the reg exp
     return re.compile(r'^.*?[.](?P<ext>fa\.gz|fasta\.gz|vcf\.gz|\w+)$').match(filename).group('ext')
 
 def get_files(input_path, admited_formats):
-    """
+    """Return a list of path files.
+
+        Arguments:
+         - input_path - string, the path where will look for the files
+         - admited_formats - set, the admited formats for the files
 
     """
     result = []
@@ -23,12 +31,3 @@ def get_files(input_path, admited_formats):
         if os.path.isfile(filename) and get_file_extension(filename) in admited_formats:
             result = [os.path.abspath(filename)]
     return result
-
-def remove_items_containing(string_list, keyword):
-    """
-
-    """
-    string_list_copy = string_list.copy()
-    for item in string_list_copy:
-        if keyword in item:
-            string_list.remove(item)
