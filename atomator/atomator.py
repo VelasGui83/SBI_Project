@@ -173,7 +173,7 @@ def create_macrocomplex(model, to_evaluate):
 
                 print("Chain added. #%d" %len(model))
 
-                if len(model) >= 60:
+                if len(model) >= 200:
                     return len(model)
     return len(model)
 
