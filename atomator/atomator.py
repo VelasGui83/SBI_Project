@@ -1,5 +1,7 @@
 import argparse
 import copy
+import pickle
+import os
 
 import numpy as np
 from Bio.PDB import (MMCIFIO, PDBIO, NeighborSearch, PDBParser,
@@ -16,6 +18,9 @@ class Macrocomplex(object):
     def __init__(self):
         """Constructor of the Macrocomplex class"""
         self.model = None
+        self.to_evaluate = None
+        self.interactions = interactions.Interactions()
+
 
     def next_available_chain_label(self, excluded=None):
         """Returns the next avaliable chain label in the model.
@@ -148,7 +153,7 @@ class Macrocomplex(object):
         
         return False
 
-    def __add_chains_to_model(self, to_evaluate, max_chains):
+    def __add_chains_to_model(self, max_chains):
         """Add chains to a model and return the number of final chains.
 
         Arguments:
@@ -157,8 +162,8 @@ class Macrocomplex(object):
             - max_chains - int, maximum number of chains of the model
 
         """
-        while to_evaluate:
-            evaluating_chain = to_evaluate.pop(0)
+        while self.to_evaluate:
+            evaluating_chain = self.to_evaluate.pop(0)
 
             for candidate_chain in evaluating_chain.homologous_chains:
                 candidate_complex = candidate_chain.parent
@@ -178,7 +183,7 @@ class Macrocomplex(object):
 
                     next_to_evaluate = copy.copy(complementary_candidate_chain)
                     next_to_evaluate.label = moved_chain.id
-                    to_evaluate.append(next_to_evaluate)
+                    self.to_evaluate.append(next_to_evaluate)
 
                     print("Chain added. #%d" %len(self.model))
 
@@ -186,7 +191,7 @@ class Macrocomplex(object):
                         return len(self.model)
         return len(self.model)
 
-    def create_macrocomplex(self, input_folder, max_chains = 200, ):
+    def create_macrocomplex(self, input_folder, max_chains = 200):
         """Retruns a Bio.PDB.Structure composed by complex pairs.
 
         Arguments:
@@ -194,25 +199,48 @@ class Macrocomplex(object):
             - max_chains - int, maximum number of chains
 
         """
-        inter = interactions.Interactions()
+        self.interactions.populate_interactions(input_folder)
+        self.interactions.populate_homologous_chains(score_limit=9.8)
 
-        inter.populate_interactions(input_folder)
-        inter.populate_homologous_chains(score_limit=9.8)
-
-        remaining_complexes = inter.get_complexes_list()
+        remaining_complexes = self.interactions.get_complexes_list()
 
         parser = PDBParser()
         chain_number = 2
         while chain_number == 2:
-            first_complex = inter.interactions[remaining_complexes.pop(0)]
+            first_complex = self.interactions.interactions[remaining_complexes.pop(0)]
             first_chains = first_complex.get_chain_list()
-            to_evaluate = [first_chains[0], first_chains[1]]
+            self.to_evaluate = [first_chains[0], first_chains[1]]
             structure = parser.get_structure("final_structure", first_complex.filename)
             self.model = structure[0]
 
-            chain_number = self.__add_chains_to_model(to_evaluate, max_chains)
+            chain_number = self.__add_chains_to_model(max_chains)
         
         return structure
+
+    def continue_macrocomplex(self, max_chains = 200):
+        """Continues with the execution of the macrocomplex.
+
+        Arguments:
+            - max_chains - int, maximum number of chains
+
+        """
+        self.__add_chains_to_model(max_chains)
+        return self.model.get_parent()
+
+    def save_context(self):
+        """Save the context of the execution"""
+        out_fd = open("context.p", "wb")
+        data = (self.model.get_parent(), self.interactions, self.to_evaluate)
+        pickle.dump(data, out_fd)
+        out_fd.close()
+
+    def load_context(self):
+        """Loads the context pf the execution"""
+        data = pickle.load(open("context.p", "rb"))
+        self.model = data[0][0]
+        self.interactions = data[1]
+        self.to_evaluate = data[2]
+        os.system("rm context.p")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="This programs creates a macrocomplex given the pair of interactions.")
@@ -232,14 +260,25 @@ if __name__ == "__main__":
                         type=int,
                         default=200,
                         help="The max number of chains")
+    parser.add_argument('-r', '--rescue',
+                        dest="rescue",
+                        action="store_true",
+                        default=False,
+                        help="Restores the context of en execution")
 
     options = parser.parse_args()
     mc = Macrocomplex()
     structure = None
     try:
-        structure = mc.create_macrocomplex(options.input, options.max_chains)
+        if not options.rescue:
+            structure = mc.create_macrocomplex(options.input, options.max_chains)
+        else:
+            mc.load_context()
+            structure = mc.continue_macrocomplex(options.max_chains)
+
     except KeyboardInterrupt:
         print("Creation of macrocomplex stoped by user, saving temporary macrocomplex...")
+        mc.save_context()
         structure = mc.model.get_parent()
 
     if len(structure[0]) > 52:
