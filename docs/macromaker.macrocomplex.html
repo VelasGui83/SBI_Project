@@ -17,7 +17,7 @@
 <tr ><td bgcolor="#aa55cc" ><tt >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td >&nbsp;</td>
 <td width="100%" ><table width="100%" summary="list" ><tr ><td width="25%" valign="top" ><a href="Bio.PDB.Selection.html" >Bio.PDB.Selection</a><br />
 <a href="macromaker.alphabet.html" >macromaker.alphabet</a><br />
-</td><td width="25%" valign="top" ><a href="macromaker.center_of_mass.html" >macromaker.center_of_mass</a><br />
+</td><td width="25%" valign="top" ><a href="macromaker.lib.center_of_mass.html" >macromaker.lib.center_of_mass</a><br />
 <a href="copy.html" >copy</a><br />
 </td><td width="25%" valign="top" ><a href="macromaker.interactions.html" >macromaker.interactions</a><br />
 <a href="numpy.html" >numpy</a><br />
@@ -45,10 +45,12 @@
 <font color="#000000" face="helvetica, arial" ><a name="Macrocomplex" >class <strong >Macrocomplex</strong></a>(<a href="builtins.html#object" >builtins.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8" ><td rowspan="2" ><tt >&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan="2" ><tt >Class&nbsp;to&nbsp;model&nbsp;a&nbsp;macrocomplex<br />&nbsp;</tt></td></tr>
+<td colspan="2" ><tt ><a href="#Macrocomplex" >Macrocomplex</a>(verbose=False)<br />
+&nbsp;<br />
+Class&nbsp;to&nbsp;model&nbsp;a&nbsp;macrocomplex<br />&nbsp;</tt></td></tr>
 <tr ><td >&nbsp;</td>
 <td width="100%" >Methods defined here:<br />
-<dl ><dt ><a name="Macrocomplex-__init__" ><strong >__init__</strong></a>(self)</dt><dd ><tt >Constructor&nbsp;of&nbsp;the&nbsp;<a href="#Macrocomplex" >Macrocomplex</a>&nbsp;class</tt></dd></dl>
+<dl ><dt ><a name="Macrocomplex-__init__" ><strong >__init__</strong></a>(self, verbose=False)</dt><dd ><tt >Constructor&nbsp;of&nbsp;the&nbsp;<a href="#Macrocomplex" >Macrocomplex</a>&nbsp;class</tt></dd></dl>
 
 <dl ><dt ><a name="Macrocomplex-continue_macrocomplex" ><strong >continue_macrocomplex</strong></a>(self, max_chains=200)</dt><dd ><tt >Continues&nbsp;with&nbsp;the&nbsp;execution&nbsp;of&nbsp;the&nbsp;macrocomplex.<br />
 &nbsp;<br />
@@ -91,14 +93,20 @@ Arguments:<br />
 &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;chain&nbsp;-&nbsp;Bio.PDB.Chain,&nbsp;a&nbsp;chain&nbsp;of&nbsp;the&nbsp;model<br />
 &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;limit&nbsp;-&nbsp;int,&nbsp;the&nbsp;treshold&nbsp;of&nbsp;clashes</tt></dd></dl>
 
-<dl ><dt ><a name="Macrocomplex-load_context" ><strong >load_context</strong></a>(self)</dt><dd ><tt >Loads&nbsp;the&nbsp;context&nbsp;pf&nbsp;the&nbsp;execution</tt></dd></dl>
+<dl ><dt ><a name="Macrocomplex-load_context" ><strong >load_context</strong></a>(self, input_file)</dt><dd ><tt >Loads&nbsp;the&nbsp;context&nbsp;pf&nbsp;the&nbsp;execution<br />
+&nbsp;<br />
+Arguments:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;input_file&nbsp;-&nbsp;string,&nbsp;file&nbsp;to&nbsp;load&nbsp;the&nbsp;state</tt></dd></dl>
 
 <dl ><dt ><a name="Macrocomplex-next_available_chain_label" ><strong >next_available_chain_label</strong></a>(self, excluded=None)</dt><dd ><tt >Returns&nbsp;the&nbsp;next&nbsp;avaliable&nbsp;chain&nbsp;label&nbsp;in&nbsp;the&nbsp;model.<br />
 &nbsp;<br />
 Arguments:<br />
 &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;excluded&nbsp;-&nbsp;set,&nbsp;aditional&nbsp;set&nbsp;of&nbsp;labels&nbsp;to&nbsp;be&nbsp;omited</tt></dd></dl>
 
-<dl ><dt ><a name="Macrocomplex-save_context" ><strong >save_context</strong></a>(self)</dt><dd ><tt >Save&nbsp;the&nbsp;context&nbsp;of&nbsp;the&nbsp;execution</tt></dd></dl>
+<dl ><dt ><a name="Macrocomplex-save_context" ><strong >save_context</strong></a>(self, input_file)</dt><dd ><tt >Save&nbsp;the&nbsp;context&nbsp;of&nbsp;the&nbsp;execution<br />
+&nbsp;<br />
+Arguments:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;input_file&nbsp;-&nbsp;string,&nbsp;file&nbsp;to&nbsp;save&nbsp;the&nbsp;state</tt></dd></dl>
 
 <hr />
 Data descriptors defined here:<br />

@@ -101,7 +101,7 @@ def chimera_option():
         
 #  ---Setting the window and its parameters---
 root = Tk()
-root.title("MacroMakerPDB-GUI")
+root.title("macromaker-gui")
 width_of_window = 900
 height_of_window = 300
 screen_width = root.winfo_screenwidth()
@@ -134,7 +134,7 @@ b.grid(row=1, column=0, padx=10, pady=10)
 # ---Selected chains and its label---
 var = IntVar()
 
-label = Label(frame_options, relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
+label = Label(frame_options, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
 label.grid(row = 0, column = 1, padx=10, pady=10)
 
 starting_by = Scale(frame_options, variable = var, command = update, orient = HORIZONTAL, from_= 1, to = 300)
@@ -163,7 +163,7 @@ heteroatoms.grid(row = 2, column = 1, padx = 10, pady = 10)
 #  ---Checkbutton rescue---
 var_rescue = BooleanVar()
 
-check_rescue = Checkbutton(frame_options, command=restart_process, text="Use re-take file", variable=var_rescue, onvalue=True, offvalue=False, height=2, width=20, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+check_rescue = Checkbutton(frame_options, command=restart_process, text="Use re-take file", variable=var_rescue, onvalue=True, offvalue=False, height=2, width=20, font = ("Symbol", 10, "bold"))
 check_rescue.grid(row = 2, column = 0, padx = 10, pady = 10)
 
 
@@ -172,12 +172,12 @@ rescue_path = StringVar()
 
 label_rescue = Label(frame_options, text = "SELECTED RESCUE FILE:", relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
 
-rescue_b = Button( frame_options, text="Select Security\nCopy/Re-take File", command=select_rescue_file, relief = SUNKEN, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+rescue_b = Button( frame_options, text="Select Security\nCopy/Re-take File", padx=10, pady=10, command=select_rescue_file, font = ("Symbol", 10, "bold"))
 
 
 #  --- Submit button---
 # if (rescue_path.get() != "" and out_name.get() != "") or (directory_path.get() != "" and out_name.get() != "") :
-printing_b = Button( frame_options, text="Submit", command=printing, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+printing_b = Button( frame_options, text="Submit", padx=10, pady=10, command=printing, font = ("Symbol", 10, "bold"))
 printing_b.grid(row= 3, column = 1, padx = 10, pady = 10)
 # else:
 #     printing_b = Button( frame_options, text="Submit", command=printing, state = DISABLED)
