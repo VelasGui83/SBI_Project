@@ -105,7 +105,7 @@ The project has been carried out by a group of students of the [Universitat Pomp
 
 - **[Medel, Brian](https://www.linkedin.com/in/brian-medel-lacruz-480327172/)**
 - **[Pradas, Gerard](https://www.linkedin.com/in/gpradas/)**
-- **[Velasco, Daniel]()**
+- **[Velasco, Daniel](https://www.linkedin.com/in/daniel-velasco-guisado-670243182/)**
 
 
 License
