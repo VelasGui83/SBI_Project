@@ -1,3 +1,0 @@
-"""
-The macromaker main package
-"""
