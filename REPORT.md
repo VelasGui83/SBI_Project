@@ -56,7 +56,7 @@ Here we present some of the features that macromaker has:
 - When building huge macro-molecular systems, the user may need to stop the job without losing all the computational time done, that is why a **Pause-Recover system** is included in the program. If you want to take advantage of this option, please go visit the manual “README”.
 - If you desire to **remove the crystallographic waters, solvent residues, hydrogens, heteroatoms or alternative atom locations** from your input PDB files and the Output model, please head to the “README” usage. Keep in mind that weird residues positions may derive into clashes, deriving in a bad model.
 
-## Working in progress
+## Working in progress (not implemented)
 
 We decided to implement an option where the user is able to submit the output model to a **minimization dynamic**, useful for retrieving a more accurate model where the side chains and possible clashes are relaxed. Keep in mind that this part is on development and will not work for all models. 
 - PDB output model will be used to perform a minimization. 

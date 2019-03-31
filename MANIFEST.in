@@ -10,3 +10,4 @@ include LICENSE
 # Include the example files
 recursive-include examples *
 recursive-include docs *
+recursive-include energy_minification *

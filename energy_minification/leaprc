@@ -1,0 +1,8 @@
+source leaprc.protein.ff14SB
+sample = loadPDB "/home/brian/Escritorio/test/sample.pdb"
+source leaprc.water.tip3p
+solvatebox sample TIP3PBOX 10.0
+addions sample Na+ 0
+addions sample Cl- 0
+saveAmberParm sample sample_xleap.parm sample_xleap.crd
+quit
