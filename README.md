@@ -96,7 +96,7 @@ So, some old PDB files that have right-justified the column of atom type, make o
 
     correct-pdb -i /path/to/pdb/folder/
 
-This will create new PDB files and remove the old ones.
+This will create new PDB files and remove the old ones, so it seems to be a good idea to have a fisrt look at those PDBs before running macromaker...
 
 Authors
 =======

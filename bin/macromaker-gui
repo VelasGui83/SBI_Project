@@ -13,7 +13,6 @@ class OptionsFrame(Frame):
         super().__init__()
         self["height"] = 200
         self["width"] = 10
-        self["relief"] = SUNKEN
         self["bd"] = 5
 
 def dir_sel():
@@ -125,20 +124,20 @@ frame_options = OptionsFrame(root)
 directory_path = StringVar()
 directory_path.set(getcwd())
 
-label_directory = Label(frame_options, text = "SELECTED DIRECTORY:\n%s" % (directory_path.get()), bg = "#07a808", relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
+label_directory = Label(frame_options, text = "SELECTED DIRECTORY:\n%s" % (directory_path.get()), relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
 label_directory.grid(row=0, column=0, padx=10, pady=10)
 
-b = Button( frame_options, text="Select Directory\nPair-Chains", command = dir_sel, bg = "#07a808", relief = SUNKEN, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+b = Button( frame_options, text="Select Directory\nPair-Chains", command = dir_sel, padx=10, pady=10, font = ("Symbol", 10, "bold"))
 b.grid(row=1, column=0, padx=10, pady=10)
 
 
 # ---Selected chains and its label---
 var = IntVar()
 
-label = Label(frame_options, bg = "#07a808", relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
+label = Label(frame_options, relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
 label.grid(row = 0, column = 1, padx=10, pady=10)
 
-starting_by = Scale(frame_options, variable = var, command = update, orient = HORIZONTAL, from_= 1, to = 300, troughcolor = "red" , bg = "#07a808")
+starting_by = Scale(frame_options, variable = var, command = update, orient = HORIZONTAL, from_= 1, to = 300)
 starting_by.grid(row = 1, column = 1, padx=10, pady=10)
 update(var.get())
 
@@ -147,38 +146,38 @@ update(var.get())
 out_name = StringVar()
 out_name.set(getcwd() + "/result")
 
-label_out = Label(frame_options, text = "OUTPUT FILEPATH:\n%s" % (out_name.get()), bg = "#07a808", relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
+label_out = Label(frame_options, text = "OUTPUT FILEPATH:\n%s" % (out_name.get()), relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
 label_out.grid(row=0, column=2, padx=10, pady=10)
 
-out_b = Button( frame_options, text="Select Output\nName/Directory", command = sel_out, bg = "#07a808", relief = SUNKEN, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+out_b = Button( frame_options, text="Select Output\nName/Directory", command = sel_out, padx=10, pady=10, font = ("Symbol", 10, "bold"))
 out_b.grid(row=1, column=2, padx=10, pady=10)
 
 
 #  ---Checkbox remove heteroatoms and variable---
 var_hetero = BooleanVar()
 
-heteroatoms = Checkbutton(frame_options, text="Remove heteroatoms", variable=var_hetero, onvalue=True, offvalue=False, height=2, width=20, bg = "#07a808", relief = SUNKEN, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+heteroatoms = Checkbutton(frame_options, text="Remove heteroatoms", variable=var_hetero, onvalue=True, offvalue=False, height=2, width=20, padx=10, pady=10, font = ("Symbol", 10, "bold"))
 heteroatoms.grid(row = 2, column = 1, padx = 10, pady = 10)
 
 
 #  ---Checkbutton rescue---
 var_rescue = BooleanVar()
 
-check_rescue = Checkbutton(frame_options, command=restart_process, text="Use re-take file", variable=var_rescue, onvalue=True, offvalue=False, height=2, width=20, bg = "#07a808", relief = SUNKEN, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+check_rescue = Checkbutton(frame_options, command=restart_process, text="Use re-take file", variable=var_rescue, onvalue=True, offvalue=False, height=2, width=20, padx=10, pady=10, font = ("Symbol", 10, "bold"))
 check_rescue.grid(row = 2, column = 0, padx = 10, pady = 10)
 
 
 #  ---Rescue file selector and its label (ONLY IF CHKBUTTON TRUE)---
 rescue_path = StringVar()
 
-label_rescue = Label(frame_options, text = "SELECTED RESCUE FILE:", bg = "#07a808", relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
+label_rescue = Label(frame_options, text = "SELECTED RESCUE FILE:", relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
 
-rescue_b = Button( frame_options, text="Select Security\nCopy/Re-take File", command=select_rescue_file, bg = "#07a808", relief = SUNKEN, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+rescue_b = Button( frame_options, text="Select Security\nCopy/Re-take File", command=select_rescue_file, relief = SUNKEN, padx=10, pady=10, font = ("Symbol", 10, "bold"))
 
 
 #  --- Submit button---
 # if (rescue_path.get() != "" and out_name.get() != "") or (directory_path.get() != "" and out_name.get() != "") :
-printing_b = Button( frame_options, text="Submit", command=printing, bg = "#07a808", relief = SUNKEN, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+printing_b = Button( frame_options, text="Submit", command=printing, padx=10, pady=10, font = ("Symbol", 10, "bold"))
 printing_b.grid(row= 3, column = 1, padx = 10, pady = 10)
 # else:
 #     printing_b = Button( frame_options, text="Submit", command=printing, state = DISABLED)
