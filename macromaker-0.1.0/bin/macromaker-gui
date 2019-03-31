@@ -1,0 +1,224 @@
+#!/usr/bin/env python3
+import os
+from os import getcwd
+from tkinter import *
+from tkinter import messagebox
+from tkinter.filedialog import askdirectory, askopenfilename, asksaveasfilename
+
+from Bio.PDB import MMCIFIO, PDBIO
+
+import macromaker.exclude_water as exclude
+import macromaker.lib.pdbtext as pdbtext
+import macromaker.utils as utils
+from macromaker.macrocomplex import Macrocomplex
+
+
+mc = Macrocomplex(verbose=True)
+structure = None
+
+class OptionsFrame(Frame):
+    """
+    Class defining the parameters of the main frame.
+    """
+    def __init__(self, complete_window):
+        super().__init__()
+        self["height"] = 200
+        self["width"] = 10
+        self["bd"] = 5
+
+def dir_sel():
+    """
+    Saves the input directory containing the pair of chains interactions and updates the label.
+    """
+    directory_path.set(askdirectory(initialdir=getcwd(), title = "Select input directory"))
+    label_directory.config( text = "SELECTED DIRECTORY:\n%s" % (directory_path.get()))
+
+def update(value):
+    """
+    Updates the label that shows the number of chains selected.
+    """
+    label.config( text = "NUMBER CHAINS: %s" % (value) )
+
+def sel_out():
+    """
+    Saves the output filepath and updates the label.
+    """
+    out_name.set(asksaveasfilename(initialdir=getcwd(), title = "Select output file name (no extension)"))
+    label_out.config( text = "OUTPUT FILEPATH:\n%s" % (out_name.get()))
+    
+def restart_process():
+    """
+    After activating the checkbox of using a retake document this refreshes the buttons and checkboxes.
+    """
+    if var_rescue.get() == True:
+        label_directory.grid_forget()
+        b.grid_forget()
+        directory_path.set("")
+        label_rescue.grid(row=0, column=0, padx=10, pady=10)
+        rescue_b.grid(row= 1, column = 0, padx = 10, pady = 10)
+
+    else:
+        label_rescue.grid_forget()
+        rescue_b.grid_forget()
+        rescue_path.set("")
+        directory_path.set(getcwd())
+        label_rescue.config( text = "SELECTED RESCUE FILE:")
+        label_directory.config( text = "SELECTED DIRECTORY:\n%s" % (directory_path.get()))
+        label_directory.grid(row=0, column=0, padx=10, pady=10)
+        b.grid(row=1, column=0, padx=10, pady=10)
+
+
+def select_rescue_file():
+    """
+    Sets the path name of the new retake file after trying to close the window and refreshes the label.
+    """
+    rescue_path.set(askopenfilename(initialdir=getcwd(), filetypes=[("Re-take",("*.rtk")),("All files","*.*")]))
+    label_rescue.config( text = "SELECTED RESCUE FILE:\n%s" % (rescue_path.get()))
+
+
+def on_closing():
+    """
+    Trows a popup to the user when the user tries to close the main window and asks him if he wants to save the actual process.
+    """
+    
+    respuesta = messagebox.askyesnocancel("Quit", "Do you want to save process?")
+
+    if(respuesta == False): 
+        root.destroy()
+    elif (respuesta == True): 
+        security_copy_path.set(asksaveasfilename(initialdir = getcwd(), defaultextension = '.rtk', title = "Save retake file", filetypes=[("Re-take",("*.rtk")),("All files","*.*")]))
+        mc.save_context(security_copy_path.get())
+        root.destroy()
+
+def printing():
+    """
+    Prints the variables conatining essential variables for the programm.
+    """
+    messagebox.showinfo("Information", "Your macrocomplex is being constructed!\nAfter the construction a pop up will be raisen!")
+    if rescue_path.get() == "":
+        if var_hetero.get():
+            files = utils.get_files(directory_path.get(), set(["pdb"]))
+            for pdb_file in files:
+                pdbtext.clean_pdb(pdb_file, pdb_file)
+        structure = mc.create_macrocomplex(directory_path.get(), var.get())
+    else:
+        mc.load_context(rescue_path.get())
+        structure = mc.continue_macrocomplex(var.get())
+
+    if len(structure[0]) > 52:
+        io = MMCIFIO()
+        io.set_structure(structure)
+        io.save(filepath=out_name.get()+".cif", select=exclude.ExcludeWaterSelect())
+        chimera_option(out_name.get()+".cif")
+    else:
+        io = PDBIO()
+        io.set_structure(structure)
+        io.save(file=out_name.get()+".pdb", select=exclude.ExcludeWaterSelect())
+        chimera_option(out_name.get()+".pdb")
+
+def chimera_option(dir):
+    """
+    Trows a popup to the user when the process has finished and gives the option to open the resulting macrocomplex with chimera.
+    """
+    visualize_macrocomplex = messagebox.askyesno("Process finished!", "Do you want to open your macrocomplex with chimera?")
+    if visualize_macrocomplex:
+        os.system("chimera "+dir)
+
+        
+#  ---Setting the window and its parameters---
+root = Tk()
+root.title("macromaker-gui")
+width_of_window = 900
+height_of_window = 300
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+x_coordinate = (screen_width/2) - (width_of_window/2)
+y_coordinate = (screen_height/2) - (height_of_window/2)
+root.geometry("%dx%d+%d+%d" % (width_of_window, height_of_window, x_coordinate, y_coordinate))
+root.grid_columnconfigure(0, weight=1)
+root.grid_rowconfigure(0, weight=1)
+root.resizable(False, False)
+root.protocol("WM_DELETE_WINDOW", on_closing)
+
+#  ---Variable containing the path of the sabed retake file---
+security_copy_path = StringVar()
+
+#  ---Starting the frame---
+frame_options = OptionsFrame(root)
+
+#  ---Pair Chains directory of pdbs (INPUT) variable if the path, button and its label---
+directory_path = StringVar()
+directory_path.set(getcwd())
+
+label_directory = Label(frame_options, text = "SELECTED DIRECTORY:\n%s" % (directory_path.get()), relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
+label_directory.grid(row=0, column=0, padx=10, pady=10)
+
+b = Button( frame_options, text="Select Directory\nPair-Chains", command = dir_sel, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+b.grid(row=1, column=0, padx=10, pady=10)
+
+
+# ---Selected chains and its label---
+var = IntVar()
+
+label = Label(frame_options, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
+label.grid(row = 0, column = 1, padx=10, pady=10)
+
+starting_by = Scale(frame_options, variable = var, command = update, orient = HORIZONTAL, from_= 1, to = 300)
+starting_by.set(200)
+starting_by.grid(row = 1, column = 1, padx=10, pady=10)
+update(var.get())
+
+
+#  ---Outpuc file variable, selector and its label---
+out_name = StringVar()
+out_name.set(getcwd() + "/result")
+
+label_out = Label(frame_options, text = "OUTPUT FILEPATH:\n%s" % (out_name.get()), relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
+label_out.grid(row=0, column=2, padx=10, pady=10)
+
+out_b = Button( frame_options, text="Select Output\nName/Directory", command = sel_out, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+out_b.grid(row=1, column=2, padx=10, pady=10)
+
+
+#  ---Checkbox remove heteroatoms and variable---
+var_hetero = BooleanVar()
+
+heteroatoms = Checkbutton(frame_options, text="Remove heteroatoms", variable=var_hetero, onvalue=True, offvalue=False, height=2, width=20, padx=10, pady=10, font = ("Symbol", 10, "bold"))
+heteroatoms.grid(row = 2, column = 1, padx = 10, pady = 10)
+
+
+#  ---Checkbutton rescue---
+var_rescue = BooleanVar()
+
+check_rescue = Checkbutton(frame_options, command=restart_process, text="Use re-take file", variable=var_rescue, onvalue=True, offvalue=False, height=2, width=20, font = ("Symbol", 10, "bold"))
+check_rescue.grid(row = 2, column = 0, padx = 10, pady = 10)
+
+
+#  ---Rescue file selector and its label (ONLY IF CHKBUTTON TRUE)---
+rescue_path = StringVar()
+
+label_rescue = Label(frame_options, text = "SELECTED RESCUE FILE:", relief = SUNKEN, padx=10, pady=10, font = ("Helvetica", 10, "bold italic"))
+
+rescue_b = Button( frame_options, text="Select Security\nCopy/Re-take File", padx=10, pady=10, command=select_rescue_file, font = ("Symbol", 10, "bold"))
+
+
+#  --- Submit button---
+# if (rescue_path.get() != "" and out_name.get() != "") or (directory_path.get() != "" and out_name.get() != "") :
+printing_b = Button( frame_options, text="Submit", padx=10, pady=10, command=printing, font = ("Symbol", 10, "bold"))
+printing_b.grid(row= 3, column = 1, padx = 10, pady = 10)
+# else:
+#     printing_b = Button( frame_options, text="Submit", command=printing, state = DISABLED)
+#     printing_b.grid(row= 2, column = 1, padx = 10, pady = 10)
+
+#  ---Setting grid configuration---
+frame_options.grid_columnconfigure(0, weight = 1)
+frame_options.grid_columnconfigure(1, weight = 1)
+frame_options.grid_columnconfigure(2, weight = 1)
+frame_options.grid_rowconfigure(0, weight = 1)
+frame_options.grid_rowconfigure(1, weight = 1)
+frame_options.grid_rowconfigure(2, weight = 1)
+frame_options.grid_rowconfigure(3, weight = 1)
+frame_options.grid(row = 0, column = 0, sticky = "nsew")
+
+
+root.mainloop()

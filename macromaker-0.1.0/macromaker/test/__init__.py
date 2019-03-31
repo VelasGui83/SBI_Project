@@ -1,0 +1,3 @@
+"""
+The macromaker test package
+"""
