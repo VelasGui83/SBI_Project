@@ -1,0 +1,55 @@
+#!/usr/bin/python3
+import argparse
+
+from Bio.PDB import MMCIFIO, PDBIO
+
+import macromaker.exclude_water as exclude
+from macromaker.macrocomplex import Macrocomplex
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="This programs creates a macrocomplex given the pair of interactions.")
+    parser.add_argument('-i', '--input',
+                        dest="input",
+                        action="store",
+                        required=True,
+                        help="The input folder containing the complexes files")
+    parser.add_argument('-o', '--output',
+                        dest="output",
+                        action="store",
+                        default="./macrocomplex",
+                        help="The output file")
+    parser.add_argument('-c', '--chain-limit',
+                        dest="max_chains",
+                        action="store",
+                        type=int,
+                        default=200,
+                        help="The max number of chains")
+    parser.add_argument('-r', '--rescue',
+                        dest="rescue",
+                        action="store_true",
+                        default=False,
+                        help="Restores the context of en execution")
+
+    options = parser.parse_args()
+    mc = Macrocomplex()
+    structure = None
+    try:
+        if not options.rescue:
+            structure = mc.create_macrocomplex(options.input, options.max_chains)
+        else:
+            mc.load_context()
+            structure = mc.continue_macrocomplex(options.max_chains)
+
+    except KeyboardInterrupt:
+        print("Creation of macrocomplex stoped by user, saving temporary macrocomplex...")
+        mc.save_context()
+        structure = mc.model.get_parent()
+
+    if len(structure[0]) > 52:
+        io = MMCIFIO()
+        io.set_structure(structure)
+        io.save(filepath=options.output+".cif", select=exclude.ExcludeWaterSelect())
+    else:
+        io = PDBIO()
+        io.set_structure(structure)
+        io.save(file=options.output+".pdb", select=exclude.ExcludeWaterSelect())

@@ -1,18 +1,21 @@
 from setuptools import setup
 
 setup(
-    name='atomator',
+    name='macromaker',
     version='0.1.0',
-    author='An Awesome Coder',
-    author_email='aac@example.com',
-    packages=['atomator', 'atomator.test'],
-    scripts=['bin/script1','bin/script2'],
-    url='http://pypi.python.org/pypi/PackageName/',
-    license='LICENSE.txt',
-    description='An awesome package that does something',
-    long_description=open('README.txt').read(),
+    description='A macrocomplex maker from pdb pieces',
+    url='http://pypi.python.org/pypi/macromaker-pdb/',
+    author='The Bioinfo Crew',
+    keywords='protein pdb macrocomplex',
+    packages=['macromaker', 'macromaker.test'],
+    scripts=['bin/macromaker','bin/correct-pdb'],
+    license='GNU GPLv3',
+    long_description=open('README.md').read(),
     install_requires=[
-        "Django >= 1.1.1",
+        "biopython >= 1.73",
+        "python-Levenshtein >= 0.12.0",
+        "numpy >= 1.16.2",
         "pytest",
     ],
+    python_requires='>=3',
 )
