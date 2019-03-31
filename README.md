@@ -34,16 +34,7 @@ We have used some third party modules from github projects, that are not listed 
 Installation
 ============
 
-The easiest way to install macromaker is to use the pypi python distribution from the following link.
-
-http://pypi.python.org/pypi/macromaker/
-
-
-You can run the following command to install macromaker:
-
-    python -m pip install macromaker
-
-Altenatively, you can download the repo and install via setup.py with:
+The easiest way to install macromaker is to download the repo and install via setup.py with:
 
     sudo python setup.py install
 
