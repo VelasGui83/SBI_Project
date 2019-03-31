@@ -1,9 +1,20 @@
 #!/usr/bin/env python3
+import os
+from os import getcwd
 from tkinter import *
 from tkinter import messagebox
-from tkinter.filedialog import askdirectory, asksaveasfilename, askopenfilename
-from os import getcwd
+from tkinter.filedialog import askdirectory, askopenfilename, asksaveasfilename
 
+from Bio.PDB import MMCIFIO, PDBIO
+
+import macromaker.exclude_water as exclude
+import macromaker.lib.pdbtext as pdbtext
+import macromaker.utils as utils
+from macromaker.macrocomplex import Macrocomplex
+
+
+mc = Macrocomplex(verbose=True)
+structure = None
 
 class OptionsFrame(Frame):
     """
@@ -76,7 +87,7 @@ def on_closing():
         root.destroy()
     elif (respuesta == True): 
         security_copy_path.set(asksaveasfilename(initialdir = getcwd(), defaultextension = '.rtk', title = "Save retake file", filetypes=[("Re-take",("*.rtk")),("All files","*.*")]))
-        print(security_copy_path.get())
+        mc.save_context(security_copy_path.get())
         root.destroy()
 
 def printing():
@@ -85,19 +96,34 @@ def printing():
     """
     messagebox.showinfo("Information", "Your macrocomplex is being constructed!\nAfter the construction a pop up will be raisen!")
     if rescue_path.get() == "":
-        print(directory_path.get(), var.get(), out_name.get(), var_hetero.get())
+        if var_hetero.get():
+            files = utils.get_files(directory_path.get(), set(["pdb"]))
+            for pdb_file in files:
+                pdbtext.clean_pdb(pdb_file, pdb_file)
+        structure = mc.create_macrocomplex(directory_path.get(), var.get())
     else:
-        print(rescue_path.get(), var.get(), out_name.get(), var_hetero.get())
+        mc.load_context(rescue_path.get())
+        structure = mc.continue_macrocomplex(var.get())
 
-def chimera_option():
+    if len(structure[0]) > 52:
+        io = MMCIFIO()
+        io.set_structure(structure)
+        io.save(filepath=out_name.get()+".cif", select=exclude.ExcludeWaterSelect())
+        chimera_option(out_name.get()+".cif")
+    else:
+        io = PDBIO()
+        io.set_structure(structure)
+        io.save(file=out_name.get()+".pdb", select=exclude.ExcludeWaterSelect())
+        chimera_option(out_name.get()+".pdb")
+
+def chimera_option(dir):
     """
     Trows a popup to the user when the process has finished and gives the option to open the resulting macrocomplex with chimera.
     """
     visualize_macrocomplex = messagebox.askyesno("Process finished!", "Do you want to open your macrocomplex with chimera?")
-    if (visualize_macrocomplex == True):
-        pass
-    else: 
-        pass
+    if visualize_macrocomplex:
+        os.system("chimera "+dir)
+
         
 #  ---Setting the window and its parameters---
 root = Tk()

@@ -82,9 +82,11 @@ To resume the execution of a previous build, you can call macromaker with option
 
 This will find a file called _rescue.rtk_ to use it as an input to resume the execution.
 
-## macromaker-gui
+## macromaker-gui (unestable)
 
 This is the graphical interface for macromaker. It can do the same as the non graphic interface. And as it is such an intuitive interface, we think that no usage is required.
+
+__Due to deadlines, the gui has not been tested a lot.__
 
 ## correct-pdb
 
