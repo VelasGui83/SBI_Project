@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import argparse
 import os
-import macromaker.utils
+import macromaker.utils as utils
 
 def correct_pdb(input_file):
     """Rerwite pdb file with left justified column for atom type

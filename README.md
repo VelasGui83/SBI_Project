@@ -1,71 +1,114 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+Macromaker README file
+======================
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+Macromaker is a python application with an easy interface for the construction of a quaternary structure, given a folder with interaction pairs of terciary structures in PDB format. Other freatures of macromaker are:
 
-## About macromaker
+- Save / restore the executrion of a macrocomplex construction.
+- Import into a pyhon project instead of using it as standalone application. 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Requeriments
+============
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+There are some requeriments for using macromaker. As macromaker performs structural alignment, and can reduce energy of the final result, we need some specific software installed:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- [Python 3](https://www.python.org/) (https://www.python.org/)
+- [STAMP](http://www.compbio.dundee.ac.uk/downloads/stamp/) (http://www.compbio.dundee.ac.uk/downloads/stamp/)
+- [AmberTools 18](http://ambermd.org/AmberTools.php) (http://ambermd.org/AmberTools.php)
 
-## Installation
+Third-party modules
+===================
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+During the realization of the project, we used several python modules fount in http://pypi.org/. These modules are:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1100 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost you and your team's skills by digging into our comprehensive video library.
+- [biopython](https://pypi.org/project/biopython/)
+- [python-Levenshtein](https://pypi.org/project/python-Levenshtein/)
+- [numpy](https://pypi.org/project/numpy/)
 
-## Authors
+We have used some third party modules from github projects, that are not listed in setup.py, those are:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+- [pdbremix/pdbstrip](https://github.com/boscoh/pdbremix) (https://github.com/boscoh/pdbremix)
+- [center_of_mass](https://github.com/rasbt/protein-science/tree/master/scripts-and-tools/center_of_mass) (https://github.com/rasbt/protein-science/tree/master/scripts-and-tools/center_of_mass)
+- [python-mkdoc](https://github.com/kata198/python-mkdoc) (https://github.com/kata198/python-mkdoc)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
-- [Abdel Elrafa](https://abdelelrafa.com)
 
-## Contributing
+Installation
+============
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The easiest way to install macromaker is to use the pypi python distribution from the following link.
 
-## Security Vulnerabilities
+http://pypi.python.org/pypi/macromaker/
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
+You can run the following command to install macromaker:
 
-The Laravel framework is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    python -m pip install macromaker
+
+Altenatively, you can download the repo and install via setup.py with:
+
+    sudo python setup.py install
+
+Usage
+===== 
+
+## macromaker
+
+Macromaker is a very simple and intuitve quaternary structure builder, given a set of interaction pairs of terciary structures. 
+
+The simples way to run will be:
+
+    macromaker -i /path/to/pdb/folder/
+
+This will produce a file named _macrocomplex.pdb_ in the current path.
+
+If we want to specify the output we can run macrocomplex with -o argument:
+
+    macromaker -i /path/to/pdb/folder/ -o /other/path/macrocomplex_name
+
+Another interesting thing about macromaker is that it can build infinity structures, for avoiding that non-sense, a max of __200 chains__ is allower. Nevertheless, we can change that value with -m option.
+
+    macromaker -i /path/to/infinite/pdb/ -m 300
+
+Other feature of macromaker is that it can clean the original pdb files before starting to build the complex. __By default, waters and other hetero atoms are not removed.__
+
+    macromaker -i /path/to/pdb/folder/ -c
+
+The last awsome feature of macromaker is that it can pause and resume the execution of macrocomplex build process.
+
+The creation of a rescue file is done automaticaly when canceling the execution of the program with __Ctrl+C__. This will create a _rescue.rtk_ file in the current path.
+
+To resume the execution of a previous build, you can call macromaker with option -r.
+
+    macromaker -i /path/to/pdb/folder/ -r
+
+This will find a file called _rescue.rtk_ to use it as an input to resume the execution.
+
+## macromaker-gui
+
+This is the graphical interface for macromaker. It can do the same as the non graphic interface. And as it is such an intuitive interface, we think that no usage is required.
+
+## correct-pdb
+
+The main workflow of macromaker uses STAMP to do structural alignment.
+
+During the proces of developing this project, we find out that some PDB broke our software. More concretly, STAMP is the responsable, because looking at the source code, we found out that STAMP looks for CA in specific position in PDB files.
+  
+So, some old PDB files that have right-justified the column of atom type, make our project crash. To bypass this, we created this script that reads a folder with PDB files, left-justify the atom type column.
+
+    correct-pdb -i /path/to/pdb/folder/
+
+This will create new PDB files and remove the old ones.
+
+Authors
+=======
+
+The project has been carried out by a group of students of the [Universitat Pompeu Fabra](https://www.upf.edu/)'s [MCs in Bioinformatics for Heath Sciences](https://www.upf.edu/web/bioinformatics/). These guys are:
+
+- **[Medel, Brian](https://www.linkedin.com/in/brian-medel-lacruz-480327172/)**
+- **[Pradas, Gerard](https://www.linkedin.com/in/gpradas/)**
+- **[Velasco, Daniel]()**
+
+
+License
+=======
+
+Macromaker is open-source software licensed under the [GNU GLPv3](https://opensource.org/licenses/GPL-3.0).

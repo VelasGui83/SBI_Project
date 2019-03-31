@@ -130,7 +130,6 @@ REMARK   3   MAIN-CHAIN ANGLE             (A**2) : NULL  ; NULL
 REMARK   3   SIDE-CHAIN BOND              (A**2) : NULL  ; NULL                 
 REMARK   3   SIDE-CHAIN ANGLE             (A**2) : NULL  ; NULL                 
 REMARK   3                                                                      
-REMARK   3  BULK SOLVENT MODELING.                                              
 REMARK   3   METHOD USED : FLAT MODEL                                           
 REMARK   3   KSOL        : 0.30                                                 
 REMARK   3   BSOL        : 38.16                                                

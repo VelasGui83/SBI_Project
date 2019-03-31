@@ -7,16 +7,17 @@ from Bio.PDB import NeighborSearch, PDBParser, Selection, Superimposer
 from Bio.PDB.Polypeptide import PPBuilder
 
 import macromaker.alphabet as alpha
-import macromaker.center_of_mass as com
+import macromaker.lib.center_of_mass as com
 import macromaker.interactions as inter
 
 class Macrocomplex(object):
     """Class to model a macrocomplex"""
-    def __init__(self):
+    def __init__(self, verbose=False):
         """Constructor of the Macrocomplex class"""
         self.model = None
         self.to_evaluate = None
         self.interactions = inter.Interactions()
+        self.verbose = verbose
 
 
     def next_available_chain_label(self, excluded=None):
@@ -188,7 +189,7 @@ class Macrocomplex(object):
                         return len(self.model)
         return len(self.model)
 
-    def create_macrocomplex(self, input_folder, max_chains = 200):
+    def create_macrocomplex(self, input_folder, max_chains=200):
         """Retruns a Bio.PDB.Structure composed by complex pairs.
 
         Arguments:
@@ -224,17 +225,28 @@ class Macrocomplex(object):
         self.__add_chains_to_model(max_chains)
         return self.model.get_parent()
 
-    def save_context(self):
-        """Save the context of the execution"""
-        out_fd = open("context.p", "wb")
-        data = (self.model.get_parent(), self.interactions, self.to_evaluate)
+    def save_context(self, input_file):
+        """Save the context of the execution
+        
+        Arguments:
+            - input_file - string, file to save the state
+        
+        """
+        out_fd = open(input_file, "wb")
+        data = (self.model.get_parent(), self.interactions, self.to_evaluate, self.verbose)
         pickle.dump(data, out_fd)
         out_fd.close()
 
-    def load_context(self):
-        """Loads the context pf the execution"""
-        data = pickle.load(open("context.p", "rb"))
+    def load_context(self, input_file):
+        """Loads the context pf the execution
+        
+        Arguments:
+            - input_file - string, file to load the state
+        
+        """
+        data = pickle.load(open(input_file, "rb"))
         self.model = data[0][0]
         self.interactions = data[1]
         self.to_evaluate = data[2]
+        self.verbose = data[3]
         os.system("rm context.p")
