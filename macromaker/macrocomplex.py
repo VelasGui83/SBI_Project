@@ -138,16 +138,18 @@ class Macrocomplex(object):
         
         if close_atoms_to_chain:
             ns = NeighborSearch(close_atoms_to_chain)
-            print("Evaluating possible clashes")
-            print("Comparing to ",len(close_atoms_to_chain), " entities")
+            if self.verbose:
+                print("Evaluating possible clashes")
+                print("Comparing to ",len(close_atoms_to_chain), " entities")
             for residue in chain:
                 for atom in residue:
                     coord_atom = (atom.get_coord())
-                    close_atoms_to_atom = ns.search(coord_atom, 1.1) #CH distance 1.09
+                    close_atoms_to_atom = ns.search(coord_atom, 0.8) #CH distance 1.09
                     if close_atoms_to_atom:
                         clashes += 1
                         if clashes >= limit:
-                            print("WARNING IMPORTANT CLASH - CHANGING CHAIN")
+                            if self.verbose:
+                                print("WARNING IMPORTANT CLASH - CHANGING CHAIN")
                             return True 
         return False
 
@@ -175,7 +177,7 @@ class Macrocomplex(object):
                 moved_chain = candidate_model[0][complementary_candidate_chain.original_label]
                 self.do_superimpose(fixed_chain, target_chain, moved_chain)
 
-                if not self.is_chain_clashed_v3(moved_chain):
+                if not self.is_chain_clashed_v3(moved_chain, limit=10):
                     moved_chain.id = self.next_available_chain_label(set([target_chain.id]))
                     self.model.add(moved_chain)
 
@@ -183,7 +185,8 @@ class Macrocomplex(object):
                     next_to_evaluate.label = moved_chain.id
                     self.to_evaluate.append(next_to_evaluate)
 
-                    print("Chain added. #%d" %len(self.model))
+                    if self.verbose:
+                        print("Chain added. #%d" %len(self.model))
 
                     if len(self.model) >= max_chains:
                         return len(self.model)
@@ -204,6 +207,10 @@ class Macrocomplex(object):
 
         parser = PDBParser()
         chain_number = 2
+
+        if self.verbose:
+            print("Starting the build...")
+
         while chain_number == 2:
             first_complex = self.interactions.interactions[remaining_complexes.pop(0)]
             first_chains = first_complex.get_chain_list()
@@ -212,7 +219,8 @@ class Macrocomplex(object):
             self.model = structure[0]
 
             chain_number = self.__add_chains_to_model(max_chains)
-        
+        if self.verbose:
+            print("Model ended.")
         return structure
 
     def continue_macrocomplex(self, max_chains = 200):
@@ -222,6 +230,8 @@ class Macrocomplex(object):
             - max_chains - int, maximum number of chains
 
         """
+        if self.verbose:
+            print("Continuing the rescued model.")
         self.__add_chains_to_model(max_chains)
         return self.model.get_parent()
 

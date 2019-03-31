@@ -4,6 +4,7 @@ __pycache__
 .pytest_cache
 macrocomplex.pdb
 macrocomplex.cif
+rescue.rtk
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

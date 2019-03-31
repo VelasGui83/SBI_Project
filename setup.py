@@ -8,7 +8,7 @@ setup(
     author='The Bioinfo Crew',
     keywords='protein pdb macrocomplex',
     packages=['macromaker', 'macromaker.lib','macromaker.test'],
-    scripts=['bin/macromaker','bin/correct-pdb'],
+    scripts=['bin/macromaker','bin/correct-pdb', 'bin/macromaker-gui'],
     license='GNU GPLv3',
     long_description=open('README.md').read(),
     install_requires=[

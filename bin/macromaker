@@ -48,6 +48,8 @@ if __name__ == "__main__":
         raise IOError("The input is not a folder")
     if os.path.isdir(os.path.abspath(options.output)):
         raise IOError("The output is not a file")
+    if options.rescue and not os.path.exists(os.path.abspath("./rescue.rtk")):
+        raise FileNotFoundError("There is no rescue file fount in the current directory named rescue.rtk")
     mc = Macrocomplex(options.verbose)
     structure = None
     try:
